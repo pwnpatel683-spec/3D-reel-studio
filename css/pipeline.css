@@ -1,0 +1,371 @@
+/* ===================================================================
+   3D REEL STUDIO — Bottom Processing Pipeline & Terminal Log
+   Phase 1 Timeline & Telemetry Styles
+   =================================================================== */
+
+.studio-bottom-dock {
+  height: var(--pipeline-height);
+  background: rgba(11, 12, 16, 0.98);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 40;
+  flex-shrink: 0;
+  transition: height var(--transition-smooth);
+}
+
+.studio-bottom-dock.terminal-expanded {
+  height: 280px;
+}
+
+/* Dock Header with Stage summary and Terminal toggle */
+.dock-header-bar {
+  height: 32px;
+  padding: 0 20px;
+  background: rgba(18, 20, 29, 0.7);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.dock-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dock-title {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-bright);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dock-title-glyph {
+  color: var(--cyber-cyan);
+}
+
+.dock-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-toggle-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+
+.terminal-toggle-btn:hover {
+  background: rgba(0, 255, 245, 0.1);
+  color: var(--cyber-cyan);
+  border-color: rgba(0, 255, 245, 0.3);
+}
+
+.terminal-toggle-btn.active {
+  background: rgba(0, 255, 245, 0.15);
+  color: var(--cyber-cyan);
+  border-color: var(--cyber-cyan);
+}
+
+/* -------------------------------------------------------------------
+   11-STAGE PROCESSING PIPELINE
+   ------------------------------------------------------------------- */
+.pipeline-track-container {
+  height: calc(var(--pipeline-height) - 32px);
+  padding: 10px 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  align-items: center;
+  scrollbar-width: thin;
+}
+
+.pipeline-track {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: max-content;
+  width: 100%;
+}
+
+/* Individual Stage Node */
+.pipeline-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(18, 20, 29, 0.8);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-normal);
+  position: relative;
+  min-width: 140px;
+}
+
+.pipeline-step:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Step Number & Icon */
+.step-num-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.step-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.step-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.step-status-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Pipeline Status States */
+/* 1. Ready State */
+.pipeline-step.status-ready {
+  border-color: rgba(0, 255, 245, 0.3);
+  background: rgba(0, 255, 245, 0.04);
+}
+
+.pipeline-step.status-ready .step-num-badge {
+  background: rgba(0, 255, 245, 0.15);
+  color: var(--cyber-cyan);
+}
+
+.pipeline-step.status-ready .step-name {
+  color: var(--text-primary);
+}
+
+.pipeline-step.status-ready .step-status-tag {
+  color: var(--cyber-cyan);
+}
+
+/* 2. Pending State */
+.pipeline-step.status-pending {
+  opacity: 0.65;
+}
+
+.pipeline-step.status-pending .step-status-tag {
+  color: var(--text-muted);
+}
+
+/* 3. Processing State */
+.pipeline-step.status-processing {
+  border-color: var(--status-processing);
+  background: rgba(255, 183, 3, 0.08);
+  box-shadow: 0 0 12px rgba(255, 183, 3, 0.2);
+}
+
+.pipeline-step.status-processing .step-num-badge {
+  background: var(--status-processing);
+  color: #0b0c10;
+}
+
+.pipeline-step.status-processing .step-name {
+  color: #fff;
+}
+
+.pipeline-step.status-processing .step-status-tag {
+  color: var(--status-processing);
+}
+
+/* 4. Completed State */
+.pipeline-step.status-completed {
+  border-color: rgba(6, 214, 160, 0.4);
+  background: rgba(6, 214, 160, 0.06);
+}
+
+.pipeline-step.status-completed .step-num-badge {
+  background: rgba(6, 214, 160, 0.2);
+  color: var(--status-completed);
+}
+
+.pipeline-step.status-completed .step-name {
+  color: var(--text-bright);
+}
+
+.pipeline-step.status-completed .step-status-tag {
+  color: var(--status-completed);
+}
+
+/* 5. Failed State */
+.pipeline-step.status-failed {
+  border-color: var(--neon-red);
+  background: rgba(255, 46, 99, 0.08);
+}
+
+.pipeline-step.status-failed .step-num-badge {
+  background: var(--neon-red);
+  color: #fff;
+}
+
+.pipeline-step.status-failed .step-status-tag {
+  color: var(--neon-red);
+}
+
+/* Connecting Arrow Divider */
+.pipeline-connector {
+  color: var(--text-disabled);
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* -------------------------------------------------------------------
+   TERMINAL DRAWER & LOGS
+   ------------------------------------------------------------------- */
+.terminal-drawer {
+  display: none;
+  flex-direction: column;
+  height: 200px;
+  background: #07080b;
+  border-top: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.studio-bottom-dock.terminal-expanded .terminal-drawer {
+  display: flex;
+}
+
+.terminal-toolbar {
+  padding: 6px 16px;
+  background: rgba(18, 20, 29, 0.9);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.terminal-title {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-terminal-action {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast);
+}
+
+.btn-terminal-action:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.terminal-body {
+  flex: 1;
+  padding: 12px 16px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.terminal-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  word-break: break-word;
+}
+
+.terminal-time {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.terminal-badge {
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.terminal-badge.info {
+  background: rgba(0, 255, 245, 0.15);
+  color: var(--cyber-cyan);
+}
+
+.terminal-badge.success {
+  background: rgba(6, 214, 160, 0.15);
+  color: var(--status-completed);
+}
+
+.terminal-badge.warning {
+  background: rgba(255, 183, 3, 0.15);
+  color: var(--status-processing);
+}
+
+.terminal-badge.error {
+  background: rgba(255, 46, 99, 0.15);
+  color: var(--neon-red);
+}
+
+.terminal-msg {
+  color: var(--text-primary);
+}

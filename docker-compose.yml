@@ -1,0 +1,46 @@
+# ===================================================================
+# 3D REEL STUDIO — Production / Local Docker Compose
+# Phase 15: Production Deployment & Container Orchestration
+# ===================================================================
+
+version: '3.8'
+
+services:
+  reel-studio-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: reel-studio-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - APP_ENV=production
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DATABASE_URL=sqlite:///data/studio.db
+      - STORAGE_DIR=storage
+      - CORS_ORIGINS=["*"]
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - COMIC_GENERATION_PROVIDER=${COMIC_GENERATION_PROVIDER:-openai}
+      - COMIC_GENERATION_MODEL=${COMIC_GENERATION_MODEL:-dall-e-3}
+      - SEGMENTATION_PROVIDER=${SEGMENTATION_PROVIDER:-opencv_guided}
+      - MAX_CONCURRENT_RENDERS=2
+    volumes:
+      - reel-data:/app/data
+      - reel-storage:/app/storage
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/live"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  reel-data:
+    driver: local
+  reel-storage:
+    driver: local

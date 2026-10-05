@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D REEL STUDIO — AI Video Transformation Studio</title>
+  <meta name="description" content="Professional AI video transformation platform transforming ordinary user videos into personalized 3D comic-style vertical Reels.">
+  
+  <!-- Production API Base URL Configuration: Set to your public HTTPS API endpoint (e.g. https://api.yourdomain.com) or leave empty for same-origin proxy / dynamic resolution -->
+  <meta name="api-base-url" content="">
+  
+  <!-- Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/studio.css">
+  <link rel="stylesheet" href="css/canvas.css">
+  <link rel="stylesheet" href="css/pipeline.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div id="app-root">
+
+    <!-- ===============================================================
+         STUDIO HEADER
+         =============================================================== -->
+    <header class="studio-header">
+      <div class="header-left">
+        <a class="brand-logo" href="#" title="3D Reel Studio — AI Creative Workspace">
+          <span class="logo-glyph">◈</span>
+          <span class="brand-title">3D REEL <span>STUDIO</span></span>
+          <span class="badge badge-cyan">PHASE 1 FOUNDATION</span>
+        </a>
+
+        <nav class="header-nav" aria-label="Main Navigation">
+          <a href="#" class="nav-link active" id="nav-studio">
+            <span>🎬</span> Studio
+          </a>
+          <a href="#" class="nav-link" id="nav-projects">
+            <span>📁</span> Projects
+          </a>
+          <a href="#" class="nav-link" id="nav-settings">
+            <span>⚙</span> Settings
+          </a>
+        </nav>
+      </div>
+
+      <div class="header-right">
+        <!-- Live System Status -->
+        <div class="system-status" id="system-status-indicator" title="Probing FastAPI Backend...">
+          <div class="status-indicator-dot" id="status-indicator-dot"></div>
+          <span class="text-muted font-mono" id="status-indicator-text">CONNECTING...</span>
+          <span class="text-muted">|</span>
+          <span class="text-muted font-mono" id="status-indicator-sub">API: STANDBY</span>
+        </div>
+
+        <!-- User Profile & Authentication Navigation -->
+        <div class="user-profile" id="user-profile-widget" title="User Account">
+          <div class="user-avatar" id="user-avatar-badge">👤</div>
+          <span class="user-name" id="user-email-display">Guest</span>
+          <button type="button" class="btn-auth-nav" id="btn-auth-action" title="Sign In / Create Account">Sign In</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===============================================================
+         MAIN THREE-AREA STUDIO WORKSPACE
+         =============================================================== -->
+    <main class="studio-workspace">
+
+      <!-- -------------------------------------------------------------
+           LEFT PANEL: CREATE REEL CONTROLS
+           ------------------------------------------------------------- -->
+      <aside class="studio-panel left-panel" aria-label="Create Reel Panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="text-cyan">◈</span> Create Reel
+          </div>
+          <span class="badge badge-optional">STUDIO V1</span>
+        </div>
+
+        <div class="panel-scroll-content">
+          <!-- 1. VIDEO SOURCE SECTION -->
+          <section class="studio-section" aria-labelledby="section-video-source">
+            <div class="section-label-row">
+              <h2 class="section-label" id="section-video-source">
+                <span>01</span> Video Source
+              </h2>
+              <span class="badge badge-red">REQUIRED</span>
+            </div>
+
+            <!-- Drag & Drop Dropzone -->
+            <div class="dropzone" id="video-dropzone" role="button" tabindex="0" aria-label="Drop video here or click to upload">
+              <div class="dropzone-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <div class="dropzone-primary-text">Drop your video here</div>
+              <div class="dropzone-secondary-text">MP4, MOV, WEBM (Up to 500MB)</div>
+              <button type="button" class="btn-upload" id="btn-choose-video">
+                <span>Choose Video</span>
+              </button>
+              <input type="file" id="video-file-input" accept="video/mp4,video/quicktime,video/webm" style="display: none;">
+            </div>
+
+            <!-- Uploaded Video Meta Container (Rendered on selection) -->
+            <div id="video-meta-container" style="display: none;"></div>
+          </section>
+
+          <!-- 2. FACE REFERENCE SECTION -->
+          <section class="studio-section" aria-labelledby="section-face-ref">
+            <div class="section-label-row">
+              <h2 class="section-label" id="section-face-ref">
+                <span>02</span> Face Reference
+              </h2>
+              <span class="badge badge-optional">OPTIONAL</span>
+            </div>
+
+            <div class="face-upload-wrapper">
+              <div class="face-preview-box" id="face-preview-box" title="Click to upload character face reference">
+                <span class="face-preview-placeholder">👤</span>
+              </div>
+              <div class="face-info-col">
+                <p class="face-desc-text" id="face-desc-text">
+                  Used to improve character identity consistency.
+                </p>
+                <div style="display: flex; gap: 6px;">
+                  <button type="button" class="btn-meta-action" onclick="document.getElementById('face-file-input').click()">
+                    Upload Image
+                  </button>
+                  <button type="button" class="btn-meta-action btn-remove" id="btn-remove-face" style="display: none;">
+                    Remove
+                  </button>
+                </div>
+                <input type="file" id="face-file-input" accept="image/jpeg,image/png,image/jpg,image/webp" style="display: none;">
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. REEL URL SECTION -->
+          <section class="studio-section" aria-labelledby="section-reel-url">
+            <div class="section-label-row">
+              <h2 class="section-label" id="section-reel-url">
+                <span>03</span> Reel URL
+              </h2>
+              <span class="badge badge-future">COMING SOON</span>
+            </div>
+
+            <div class="url-input-group">
+              <input type="url" class="studio-input" id="input-reel-url" placeholder="Paste Reel URL (Instagram, TikTok, YouTube)...">
+            </div>
+            <div class="url-future-notice">
+              <span>ℹ</span> URL import will be available in a future version.
+            </div>
+          </section>
+
+          <!-- 4. GENERATION STYLE SELECTOR -->
+          <section class="studio-section" aria-labelledby="section-gen-style">
+            <div class="section-label-row">
+              <h2 class="section-label" id="section-gen-style">
+                <span>04</span> Generation Style
+              </h2>
+              <span class="badge badge-cyan">AI MODEL</span>
+            </div>
+
+            <div class="style-grid">
+              <!-- Active Style: 3D Comic -->
+              <div class="style-card active" data-style="3d-comic" tabindex="0">
+                <div class="style-name">3D Comic</div>
+                <div class="style-tag">Default Active</div>
+              </div>
+
+              <!-- Coming Soon Styles -->
+              <div class="style-card disabled" data-style="cinematic-3d">
+                <div class="style-name">Cinematic 3D</div>
+                <div class="style-tag">Phase 7</div>
+              </div>
+
+              <div class="style-card disabled" data-style="stylized-cartoon">
+                <div class="style-name">Stylized Cartoon</div>
+                <div class="style-tag">Coming Soon</div>
+              </div>
+
+              <div class="style-card disabled" data-style="anime-3d">
+                <div class="style-name">Anime 3D</div>
+                <div class="style-tag">Coming Soon</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 5. KINETIC LYRICS TOGGLE & OPTIONS -->
+          <section class="studio-section" aria-labelledby="section-lyrics">
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title" id="section-lyrics">Kinetic Lyrics</div>
+                <div class="toggle-desc">Animated word-level synchronized typography.</div>
+              </div>
+              <label class="switch-control" aria-label="Toggle Kinetic Lyrics">
+                <input type="checkbox" id="switch-lyrics" checked>
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-sub-options" id="lyrics-options-container">
+              <div class="sub-option-row">
+                <span>Style Preset</span>
+                <select class="studio-select" id="select-lyrics-style">
+                  <option value="cyber-pop">Cyber Pop</option>
+                  <option value="neon-glow">Neon Glow</option>
+                  <option value="comic-bang">Comic Bang</option>
+                </select>
+              </div>
+              <div class="sub-option-row">
+                <span>Viewport Position</span>
+                <select class="studio-select" id="select-lyrics-pos">
+                  <option value="bottom">Bottom Third (Reel Safe)</option>
+                  <option value="center">Center Punch</option>
+                  <option value="top">Top Header</option>
+                </select>
+              </div>
+              <div class="url-future-notice" style="margin-top: 4px;">
+                <span>⚡</span> Kinetic Lyrics Engine connected in Phase 15.
+              </div>
+            </div>
+          </section>
+
+          <!-- 6. ADAPTIVE BACKGROUND TOGGLE -->
+          <section class="studio-section" aria-labelledby="section-background">
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title" id="section-background">Adaptive Background</div>
+                <div class="toggle-desc">Automatically stylize the environment according to the scene.</div>
+              </div>
+              <label class="switch-control" aria-label="Toggle Adaptive Background">
+                <input type="checkbox" id="switch-bg" checked>
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+          </section>
+
+          <!-- 7. MAIN ACTION BUTTON -->
+          <div class="main-generate-container">
+            <button type="button" class="btn-generate" id="btn-generate-reel" disabled aria-label="Generate 3D Reel">
+              <span>◈ GENERATE 3D REEL</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- -------------------------------------------------------------
+           CENTER: LIVE 9:16 STUDIO WORKSPACE
+           ------------------------------------------------------------- -->
+      <section class="center-studio" aria-label="Live Video Preview Studio">
+        <!-- Studio Stage Header -->
+        <div class="studio-stage-header">
+          <div class="stage-title-info">
+            <span class="stage-title">
+              <span class="text-cyan">◈</span> Live Reel Canvas
+            </span>
+            <span class="stage-specs" id="stage-specs-tag">9:16 | 1080×1920 (FHD) | Standby</span>
+          </div>
+
+          <div class="stage-tools">
+            <button type="button" class="tool-btn" id="btn-toggle-safezones" title="Toggle Reels / TikTok 9:16 Safe Zones">
+              <span>⧉ Safe Zones</span>
+            </button>
+            <button type="button" class="tool-btn" id="btn-demo-kinetic" title="Test Canvas Kinetic Typography Engine">
+              <span>⚡ Preview Kinetic Text</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 9:16 Vertical Reel Viewport -->
+        <div class="studio-viewport-area">
+          <div class="reel-frame" id="reel-frame-container">
+            <div class="media-container">
+              <!-- Live Video Player -->
+              <video id="video-player" playsinline preload="auto"></video>
+
+              <!-- Dynamic Transparent 2D Canvas Overlay -->
+              <canvas id="canvas-overlay"></canvas>
+
+              <!-- Safe Zone UI Overlay Guides -->
+              <div class="safe-zone-overlay" id="safe-zone-overlay">
+                <div class="safe-zone-top">TOP HEADER SAFE ZONE (9:16)</div>
+                <div class="safe-zone-bottom">CAPTION &amp; AUDIO SAFE ZONE</div>
+                <div class="safe-zone-right">ENGAGEMENT BUTTONS</div>
+              </div>
+
+              <!-- Empty Preview State -->
+              <div class="empty-preview-state" id="empty-preview-state">
+                <div class="empty-icon-shield">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                </div>
+                <div class="empty-title">Your 3D Reel preview will appear here</div>
+                <div class="empty-subtitle">Upload or drop an MP4 / MOV video from the left panel to begin.</div>
+                <div class="empty-specs-badge">
+                  <span>9:16 VERTICAL</span>
+                  <span>•</span>
+                  <span>1080 × 1920</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Studio Player Controls Bar -->
+        <div class="studio-player-bar">
+          <div class="scrubber-row">
+            <span class="time-display" id="time-display">00:00 / 00:00</span>
+            <input type="range" class="video-scrubber" id="video-scrubber" min="0" max="100" value="0" step="0.1" aria-label="Video scrubber">
+          </div>
+
+          <div class="player-controls-row">
+            <div class="controls-left">
+              <button type="button" class="ctrl-btn play-btn" id="btn-play-pause" title="Play / Pause (Space)">
+                ▶
+              </button>
+              <button type="button" class="ctrl-btn" id="btn-mute" title="Mute / Unmute (M)">
+                🔊
+              </button>
+            </div>
+
+            <div class="controls-right">
+              <button type="button" class="ctrl-btn" id="btn-fullscreen" title="Fullscreen (F)">
+                ⛶
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- -------------------------------------------------------------
+           RIGHT PANEL: STUDIO INSPECTOR
+           ------------------------------------------------------------- -->
+      <aside class="studio-panel right-panel" aria-label="Studio Inspector">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="text-cyan">⚙</span> Studio Inspector
+          </div>
+          <span class="badge badge-cyan">PARAMS</span>
+        </div>
+
+        <!-- Inspector Navigation Tabs -->
+        <div class="inspector-tabs" role="tablist">
+          <button type="button" class="tab-btn active" data-tab="generation" role="tab" aria-selected="true">Generation</button>
+          <button type="button" class="tab-btn" data-tab="consistency" role="tab" aria-selected="false">Consistency</button>
+          <button type="button" class="tab-btn" data-tab="segmentation" role="tab" aria-selected="false">Layers &amp; BG</button>
+          <button type="button" class="tab-btn" data-tab="lyrics" role="tab" aria-selected="false">Kinetic Lyrics</button>
+          <button type="button" class="tab-btn" data-tab="effects" role="tab" aria-selected="false">Effects</button>
+          <button type="button" class="tab-btn" data-tab="transcript" role="tab" aria-selected="false">Transcript</button>
+          <button type="button" class="tab-btn" data-tab="scenes" role="tab" aria-selected="false">Scenes</button>
+          <button type="button" class="tab-btn" data-tab="vision" role="tab" aria-selected="false">Vision &amp; Pose</button>
+          <button type="button" class="tab-btn" data-tab="output" role="tab" aria-selected="false">Output</button>
+        </div>
+
+        <div class="panel-scroll-content">
+          <!-- TAB 1: 3D COMIC GENERATION TAB (PHASE 9) -->
+          <div class="tab-content-panel active" id="tab-panel-generation">
+            <!-- Scene & Target Selection -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Target Scene</span>
+                <span class="badge badge-cyan" id="val-comic-target-badge">Batch Ready</span>
+              </div>
+              <select class="studio-select font-mono" id="select-generation-scene" style="width: 100%; margin-top: 6px;">
+                <option value="all">⚡ All Detected Scenes (Batch)</option>
+              </select>
+            </div>
+
+            <!-- Style Preset Selection -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">3D Comic Style Preset</span>
+                <span class="param-value-tag text-cyan font-mono" id="val-comic-style-tag">3D Comic</span>
+              </div>
+              <select class="studio-select font-mono" id="select-comic-style-preset" style="width: 100%; margin-top: 6px;">
+                <option value="3d-comic">3D Comic — Cinematic 3D Character Illustration</option>
+                <option value="cyber-hero">Cyber Hero — Futuristic Neon &amp; High-Tech Shading</option>
+                <option value="manga-noir">Manga Noir — High-Contrast Ink &amp; Halftone Depth</option>
+              </select>
+            </div>
+
+            <!-- Custom Prompt Directive -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Prompt Directive (Optional)</span>
+              </div>
+              <input type="text" class="studio-input font-mono" id="input-comic-prompt-directive" placeholder="e.g. dramatic rim lighting, vibrant cell shading..." style="width: 100%; margin-top: 6px; font-size: 11px;">
+            </div>
+
+            <!-- Trigger Action Button -->
+            <div class="param-group">
+              <button type="button" class="btn-primary-cyan" id="btn-trigger-comic-gen" style="width: 100%; justify-content: center; padding: 10px 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px;">
+                <span>⚡ Generate 3D Comic Frame</span>
+              </button>
+            </div>
+
+            <!-- Real-time Status Progression Banner -->
+            <div class="comic-status-banner" id="comic-gen-status-box" style="display: none;">
+              <div class="comic-status-spinner" id="comic-status-spinner"></div>
+              <div class="comic-status-text-group">
+                <span class="comic-status-title" id="comic-status-title">Preparing generation...</span>
+                <span class="comic-status-sub" id="comic-status-sub">Preserving scene composition &amp; facial structure</span>
+              </div>
+            </div>
+
+            <!-- Side-by-Side Comparison Container -->
+            <div class="param-group" style="margin-top: 14px;">
+              <div class="param-label-row">
+                <span class="param-label">Generated 3D Comic Frames</span>
+                <span class="badge badge-cyan" id="val-comic-frames-count">0 Frames</span>
+              </div>
+              <div class="comic-frames-scroll-list" id="comic-frames-container">
+                <div class="scenes-empty-placeholder">
+                  Generated 3D comic frames and side-by-side original comparisons will appear here.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: CHARACTER & TEMPORAL CONSISTENCY TAB (PHASE 10) -->
+          <div class="tab-content-panel" id="tab-panel-consistency">
+            <!-- Canonical Character Reference Card -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Canonical Subject Reference</span>
+                <span class="badge badge-cyan" id="val-consistency-status-badge">Locked Profile</span>
+              </div>
+              <div id="canonical-ref-preview-container" style="margin-top: 8px;">
+                <div class="scenes-empty-placeholder">
+                  Canonical face reference and style locking will appear here once vision analysis is complete.
+                </div>
+              </div>
+            </div>
+
+            <!-- Multi-Reference Angles Overview -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Multi-Reference Viewpoints</span>
+                <span class="badge badge-optional" id="val-multi-refs-badge">Frontal</span>
+              </div>
+              <div class="consistency-angles-grid" id="consistency-angles-container">
+                <span class="text-muted font-mono" style="font-size: 11px;">Single canonical frontal reference active.</span>
+              </div>
+            </div>
+
+            <!-- Target Scene & Style Lock Controls -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Consistency Target</span>
+              </div>
+              <select class="studio-select font-mono" id="select-consistency-scene" style="width: 100%; margin-top: 6px;">
+                <option value="all">⚡ All Scenes (Sequential Temporal Chaining)</option>
+              </select>
+            </div>
+
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Style Lock Preset</span>
+                <span class="param-value-tag text-cyan font-mono" id="val-consistency-style-tag">3D Comic Lock</span>
+              </div>
+              <select class="studio-select font-mono" id="select-consistency-style-preset" style="width: 100%; margin-top: 6px;">
+                <option value="3d-comic">3D Comic — Locked Cel Contours &amp; Proportions</option>
+                <option value="cyber-hero">Cyber Hero — Locked Neon &amp; High-Tech Textures</option>
+                <option value="manga-noir">Manga Noir — Locked Ink Contrast &amp; Shading</option>
+              </select>
+            </div>
+
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Prompt Directive Override (Optional)</span>
+              </div>
+              <input type="text" class="studio-input font-mono" id="input-consistency-prompt-override" placeholder="e.g. maintain jacket texture, subtle rim light..." style="width: 100%; margin-top: 6px; font-size: 11px;">
+            </div>
+
+            <!-- Trigger Action Button -->
+            <div class="param-group">
+              <button type="button" class="btn-primary-cyan" id="btn-trigger-consistency-gen" style="width: 100%; justify-content: center; padding: 10px 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px;">
+                <span>⚡ Generate Consistent Frames</span>
+              </button>
+            </div>
+
+            <!-- Real-time Status Progression Banner -->
+            <div class="comic-status-banner" id="consistency-gen-status-box" style="display: none;">
+              <div class="comic-status-spinner" id="consistency-status-spinner"></div>
+              <div class="comic-status-text-group">
+                <span class="comic-status-title" id="consistency-status-title">Preparing character reference...</span>
+                <span class="comic-status-sub" id="consistency-status-sub">Enforcing identity lock and temporal coherence</span>
+              </div>
+            </div>
+
+            <!-- Multi-Stage 3-Way Comparison Container -->
+            <div class="param-group" style="margin-top: 14px;">
+              <div class="param-label-row">
+                <span class="param-label">Temporally Consistent Frames</span>
+                <span class="badge badge-cyan" id="val-consistent-frames-count">0 Frames</span>
+              </div>
+              <div class="comic-frames-scroll-list" id="consistent-frames-container">
+                <div class="scenes-empty-placeholder">
+                  3-Way visual comparison (Original → Comic → Consistent) will appear here.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: FOREGROUND SEGMENTATION & DYNAMIC BACKGROUND TAB (PHASE 11) -->
+          <div class="tab-content-panel" id="tab-panel-segmentation">
+            <!-- Target Consistent Frame Selector -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Segmentation Target</span>
+                <span class="badge badge-cyan" id="val-seg-target-badge">Pose-Guided</span>
+              </div>
+              <select class="studio-select font-mono" id="select-segmentation-frame" style="width: 100%; margin-top: 6px;">
+                <option value="all">⚡ All Consistent Frames (Batch)</option>
+              </select>
+            </div>
+
+            <!-- Dynamic Background Adaptation Mode -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Background Adaptation Mode</span>
+                <span class="param-value-tag text-cyan font-mono" id="val-seg-mode-tag">Original</span>
+              </div>
+              <select class="studio-select font-mono" id="select-segmentation-bg-mode" style="width: 100%; margin-top: 6px;">
+                <option value="ORIGINAL">Original — Clean Inpainted Scene Context</option>
+                <option value="SOFT_BLUR">Soft Blur — Cinematic Depth-of-Field Portrait</option>
+                <option value="DEPTH_STYLE">Depth Style — Dimensional Vignette &amp; Lighting</option>
+                <option value="COMIC_STYLE">Comic Style — 3D Comic Cel Shading &amp; Ink</option>
+              </select>
+            </div>
+
+            <!-- Mask Refinement Settings -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Edge Feathering &amp; Anti-Aliasing</span>
+                <span class="param-value-tag font-mono text-muted" id="val-seg-feather-tag">3px</span>
+              </div>
+              <select class="studio-select font-mono" id="select-segmentation-feather" style="width: 100%; margin-top: 6px;">
+                <option value="3">Subtle (3px) — Sharp Character Contours</option>
+                <option value="5">Medium (5px) — Smooth Natural Blend</option>
+                <option value="9">Soft (9px) — Feathered Edge Matting</option>
+                <option value="0">Crisp (0px) — Pixel-Hard Binary Mask</option>
+              </select>
+            </div>
+
+            <!-- Action Button -->
+            <div class="param-group">
+              <button type="button" class="btn-primary-cyan" id="btn-trigger-segmentation" style="width: 100%; justify-content: center; padding: 10px 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px;">
+                <span>⚡ Segment &amp; Build Layered Scene</span>
+              </button>
+            </div>
+
+            <!-- Real-time Status Progression Banner -->
+            <div class="comic-status-banner" id="segmentation-status-box" style="display: none;">
+              <div class="comic-status-spinner" id="segmentation-status-spinner"></div>
+              <div class="comic-status-text-group">
+                <span class="comic-status-title" id="segmentation-status-title">Isolating primary character...</span>
+                <span class="comic-status-sub" id="segmentation-status-sub">Generating alpha mask &amp; reconstructing background</span>
+              </div>
+            </div>
+
+            <!-- Multi-Layer Visual Comparison Container -->
+            <div class="param-group" style="margin-top: 14px;">
+              <div class="param-label-row">
+                <span class="param-label">Layered Comic Scenes</span>
+                <span class="badge badge-cyan" id="val-segmentation-count">0 Scenes</span>
+              </div>
+              <div class="comic-frames-scroll-list" id="segmentation-layers-container">
+                <div class="scenes-empty-placeholder">
+                  4-Layer visual breakdown (Comic Frame → Mask → Foreground RGBA → Background → Composite) will appear here.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: KINETIC LYRICS & TEXT-BEHIND-CHARACTER TAB (PHASE 12) -->
+          <div class="tab-content-panel" id="tab-panel-lyrics">
+            <!-- Sync & Overall Action Row -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Kinetic Lyrics Engine</span>
+                <span class="badge badge-cyan" id="val-lyrics-sync-badge">Whisper Synced</span>
+              </div>
+              <div style="display: flex; gap: 8px; margin-top: 6px;">
+                <button type="button" class="btn-terminal-action" id="btn-sync-lyrics" style="flex: 1; padding: 6px 10px; font-size: 11px;">
+                  ⚡ Sync from Transcript
+                </button>
+                <button type="button" class="btn-terminal-action" id="btn-refresh-lyrics" style="padding: 6px 10px; font-size: 11px;" title="Reload lyric configuration">
+                  ↻ Reload
+                </button>
+              </div>
+            </div>
+
+            <!-- Kinetic Timeline Strip -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Lyric Timeline Segments</span>
+                <span class="badge badge-optional" id="val-lyrics-segments-count">0 Segments</span>
+              </div>
+              <div class="lyric-timeline-container" id="lyric-timeline-strip" style="margin-top: 6px;">
+                <div class="scenes-empty-placeholder">
+                  Timeline segments will appear here. Click 'Sync from Transcript' to initialize.
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Lyric Segment Editor Box -->
+            <div class="lyric-editor-card" id="lyric-editor-container" style="display: none;">
+              <div class="param-label-row">
+                <span class="param-label" style="color: var(--neon-cyan); font-weight: 700;">Active Segment Editor</span>
+                <span class="param-value-tag font-mono text-cyan" id="val-lyric-time-tag">0.00s - 0.00s</span>
+              </div>
+
+              <!-- Segment Text Input -->
+              <div class="param-group" style="margin-top: 8px;">
+                <span class="param-label" style="font-size: 11px;">Text Content</span>
+                <input type="text" class="studio-input font-mono" id="input-lyric-segment-text" placeholder="Enter lyric text..." style="width: 100%; margin-top: 4px; font-size: 12px; font-weight: 600;">
+              </div>
+
+              <!-- Typography Style Selector -->
+              <div class="param-group">
+                <div class="param-label-row">
+                  <span class="param-label" style="font-size: 11px;">Typography Style</span>
+                  <span class="param-value-tag font-mono text-muted" id="val-lyric-style-name">Bold Cinematic</span>
+                </div>
+                <select class="studio-select font-mono" id="select-lyric-style" style="width: 100%; margin-top: 4px; font-size: 11px;">
+                  <option value="STYLE_01_BOLD_CINEMATIC">Style 1: Bold Cinematic (White / Black Stroke / Shadow)</option>
+                  <option value="STYLE_02_MINIMAL_CLEAN">Style 2: Minimal Clean (Modern Clean Sans)</option>
+                  <option value="STYLE_03_COMIC_IMPACT">Style 3: Comic Impact (Vibrant Yellow / Red Comic Shadow)</option>
+                  <option value="STYLE_04_NEON_CYBER">Style 4: Neon Cyber (Cyber Cyan / Magenta Glow)</option>
+                  <option value="STYLE_05_DYNAMIC_OUTLINED">Style 5: Dynamic Outlined (Neon Red / White Stroke)</option>
+                </select>
+              </div>
+
+              <!-- Animation Preset Selector -->
+              <div class="param-group">
+                <div class="param-label-row">
+                  <span class="param-label" style="font-size: 11px;">Motion Animation</span>
+                  <span class="param-value-tag font-mono text-muted" id="val-lyric-anim-name">Pop</span>
+                </div>
+                <select class="studio-select font-mono" id="select-lyric-animation" style="width: 100%; margin-top: 4px; font-size: 11px;">
+                  <option value="POP">Pop — Punchy Scale Overshoot</option>
+                  <option value="SCALE_IN">Scale In — Smooth Zoom Intro</option>
+                  <option value="FADE">Fade — Smooth Linear Alpha</option>
+                  <option value="SLIDE_UP">Slide Up — Vertical Motion Glide</option>
+                  <option value="SLIDE_LEFT">Slide Left — Horizontal Reveal</option>
+                  <option value="SLIDE_RIGHT">Slide Right — Horizontal Reveal</option>
+                  <option value="BOUNCE">Bounce — Elastic Kinetic Impact</option>
+                  <option value="WORD_BY_WORD">Word by Word — Sequential Word Highlight</option>
+                </select>
+              </div>
+
+              <!-- Normalized Positioning Controls (X, Y) -->
+              <div class="param-group">
+                <div class="param-label-row">
+                  <span class="param-label" style="font-size: 11px;">Vertical Anchor (Behind Character)</span>
+                  <span class="param-value-tag font-mono text-cyan" id="val-lyric-pos-y">75% (Chest/Torso)</span>
+                </div>
+                <input type="range" class="studio-slider" id="slider-lyric-pos-y" min="0.1" max="0.9" step="0.05" value="0.75" style="width: 100%; margin-top: 4px;">
+              </div>
+
+              <div class="param-group">
+                <div class="param-label-row">
+                  <span class="param-label" style="font-size: 11px;">Horizontal Center Anchor</span>
+                  <span class="param-value-tag font-mono text-muted" id="val-lyric-pos-x">50% (Center)</span>
+                </div>
+                <input type="range" class="studio-slider" id="slider-lyric-pos-x" min="0.1" max="0.9" step="0.05" value="0.5" style="width: 100%; margin-top: 4px;">
+              </div>
+
+              <!-- Scale & Opacity Sliders -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div class="param-group">
+                  <div class="param-label-row">
+                    <span class="param-label" style="font-size: 11px;">Scale</span>
+                    <span class="param-value-tag font-mono text-muted" id="val-lyric-scale">1.0x</span>
+                  </div>
+                  <input type="range" class="studio-slider" id="slider-lyric-scale" min="0.5" max="2.0" step="0.1" value="1.0" style="width: 100%; margin-top: 4px;">
+                </div>
+                <div class="param-group">
+                  <div class="param-label-row">
+                    <span class="param-label" style="font-size: 11px;">Opacity</span>
+                    <span class="param-value-tag font-mono text-muted" id="val-lyric-opacity">100%</span>
+                  </div>
+                  <input type="range" class="studio-slider" id="slider-lyric-opacity" min="0.1" max="1.0" step="0.05" value="1.0" style="width: 100%; margin-top: 4px;">
+                </div>
+              </div>
+
+              <!-- Z-Layer Indicator -->
+              <div class="lyric-layer-indicator-row" style="margin-top: 8px; display: flex; align-items: center; gap: 8px; background: rgba(0,255,245,0.06); padding: 6px 10px; border-radius: 4px; border: 1px solid rgba(0,255,245,0.2);">
+                <span class="badge badge-cyan" style="font-size: 10px;">LAYER 1</span>
+                <span style="font-size: 11px; color: var(--text-secondary);">Z-Order: Background → <strong>Text Behind Character</strong> → Foreground</span>
+              </div>
+            </div>
+
+            <!-- Trigger Action Button -->
+            <div class="param-group" style="margin-top: 12px;">
+              <button type="button" class="btn-primary-cyan" id="btn-trigger-lyric-preview" style="width: 100%; justify-content: center; padding: 10px 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px;">
+                <span>⚡ Composite &amp; Preview Text Behind Character</span>
+              </button>
+            </div>
+
+            <!-- Status Banner -->
+            <div class="comic-status-banner" id="lyric-preview-status-box" style="display: none;">
+              <div class="comic-status-spinner" id="lyric-status-spinner"></div>
+              <div class="comic-status-text-group">
+                <span class="comic-status-title" id="lyric-status-title">Compositing kinetic typography...</span>
+                <span class="comic-status-sub" id="lyric-status-sub">Occluding text behind foreground character alpha mask</span>
+              </div>
+            </div>
+
+            <!-- Before / After Preview Split Container -->
+            <div class="param-group" style="margin-top: 14px;">
+              <div class="param-label-row">
+                <span class="param-label">Layered Occlusion Previews</span>
+                <span class="badge badge-cyan" id="val-lyric-previews-count">0 Previews</span>
+              </div>
+              <div class="comic-frames-scroll-list" id="lyric-previews-container">
+                <div class="scenes-empty-placeholder">
+                  Text-Behind-Character composite previews will appear here.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: EFFECTS TAB -->
+          <div class="tab-content-panel" id="tab-panel-effects">
+            <div class="studio-section">
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-title">Kinetic Lyrics</div>
+                  <div class="toggle-desc">Whisper word-sync kinetic animations</div>
+                </div>
+                <label class="switch-control" aria-label="Toggle Kinetic Lyrics in Inspector">
+                  <input type="checkbox" id="switch-lyrics-inspector" checked>
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="studio-section">
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-title">Adaptive Background</div>
+                  <div class="toggle-desc">Scene-aware environmental stylization</div>
+                </div>
+                <label class="switch-control" aria-label="Toggle Adaptive Background in Inspector">
+                  <input type="checkbox" id="switch-bg-inspector" checked>
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="studio-section">
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-title">Character Masking</div>
+                  <div class="toggle-desc">Foreground depth segmentation</div>
+                </div>
+                <label class="switch-control" aria-label="Toggle Character Masking">
+                  <input type="checkbox" id="switch-masking-inspector">
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: TRANSCRIPT TAB (PHASE 6) -->
+          <div class="tab-content-panel" id="tab-panel-transcript">
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Detected Language</span>
+                <span class="param-value-tag text-cyan font-mono" id="val-transcript-lang">Standby</span>
+              </div>
+              <div class="param-label-row" style="margin-top: 6px;">
+                <span class="param-label">Audio Source</span>
+                <span class="param-value-tag font-mono text-muted" id="val-transcript-audio-id">None</span>
+              </div>
+            </div>
+
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Full Transcript</span>
+                <button type="button" class="btn-terminal-action" id="btn-retranscribe" style="display: none;">⚡ Retranscribe</button>
+              </div>
+              <div class="transcript-full-text-box font-mono" id="transcript-full-text">
+                <span class="text-muted">No transcript available. Upload a video to extract audio and generate timestamped transcript.</span>
+              </div>
+            </div>
+
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Timestamped Segments</span>
+                <span class="badge badge-cyan" id="val-segments-count">0 Segments</span>
+              </div>
+              <div class="transcript-segments-list" id="transcript-segments-container">
+                <div class="transcript-empty-placeholder">
+                  Timestamped segments will appear here once audio transcription is complete.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: SCENES TAB (PHASE 7) -->
+          <div class="tab-content-panel" id="tab-panel-scenes">
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Video Stream Specs</span>
+                <button type="button" class="btn-terminal-action" id="btn-reanalyze-video" style="display: none;">⚡ Re-Analyze</button>
+              </div>
+              <div class="meta-spec-list" style="margin-top: 8px;">
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Resolution</span>
+                  <span class="meta-spec-value text-cyan font-mono" id="val-meta-resolution">Standby</span>
+                </div>
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Aspect Ratio</span>
+                  <span class="meta-spec-value font-mono" id="val-meta-ratio">--</span>
+                </div>
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">FPS &amp; Frames</span>
+                  <span class="meta-spec-value font-mono" id="val-meta-fps">--</span>
+                </div>
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Duration</span>
+                  <span class="meta-spec-value font-mono" id="val-meta-duration">--</span>
+                </div>
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Codec &amp; Format</span>
+                  <span class="meta-spec-value font-mono" id="val-meta-codec">--</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Detected Scenes &amp; Keyframes</span>
+                <span class="badge badge-cyan" id="val-scenes-count">0 Scenes</span>
+              </div>
+              <div class="scenes-scroll-list" id="scenes-container">
+                <div class="scenes-empty-placeholder">
+                  Video scene breakdown and extracted keyframes will appear here once video analysis is complete.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 5: VISION & POSE TAB (PHASE 8) -->
+          <div class="tab-content-panel" id="tab-panel-vision">
+            <!-- Primary Subject Header -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Primary Subject Tracking</span>
+                <button type="button" class="btn-terminal-action" id="btn-reanalyze-vision" style="display: none;">⚡ Re-Analyze</button>
+              </div>
+              <div class="meta-spec-list" style="margin-top: 8px;">
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Primary Status</span>
+                  <span class="meta-spec-value text-cyan font-mono" id="val-vision-primary-status">Standby</span>
+                </div>
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Subject Confidence</span>
+                  <span class="meta-spec-value font-mono" id="val-vision-confidence">--</span>
+                </div>
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Faces Localized</span>
+                  <span class="meta-spec-value font-mono" id="val-vision-faces-count">0 Detections</span>
+                </div>
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Pose Landmark Frames</span>
+                  <span class="meta-spec-value font-mono" id="val-vision-pose-frames">0 Frames (17 Pts)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Visual Overlay Toggles for Canvas -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Live Canvas Overlays</span>
+              </div>
+              <div class="vision-overlay-toggles">
+                <label class="vision-toggle-chip" id="lbl-toggle-face-box">
+                  <input type="checkbox" id="chk-toggle-face-box" checked>
+                  <span>⛶ Face Box</span>
+                </label>
+                <label class="vision-toggle-chip" id="lbl-toggle-pose-skel">
+                  <input type="checkbox" id="chk-toggle-pose-skel" checked>
+                  <span>⚡ 17-Pt Pose Skeleton</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Face Reference Crop Card -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Identity Reference Frame</span>
+                <span class="badge badge-cyan" id="val-vision-face-refs-count">0 References</span>
+              </div>
+              <div id="vision-face-ref-container">
+                <div class="scenes-empty-placeholder">
+                  Face reference crops will appear here once vision analysis is complete.
+                </div>
+              </div>
+            </div>
+
+            <!-- Tracked Subjects List -->
+            <div class="param-group">
+              <div class="param-label-row">
+                <span class="param-label">Tracked Subject Sequences</span>
+                <span class="badge badge-optional" id="val-vision-subjects-count">0 Tracks</span>
+              </div>
+              <div class="scenes-scroll-list" id="vision-subjects-container">
+                <div class="scenes-empty-placeholder">
+                  Tracked person bounding boxes and pose keypoints will be listed here.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 6: OUTPUT & FINAL REEL RENDER TAB (PHASE 13) -->
+          <div class="tab-content-panel" id="tab-panel-output">
+            <div class="reel-render-panel">
+              <!-- Output Specifications Grid -->
+              <div class="meta-spec-list">
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Aspect Ratio</span>
+                  <span class="meta-spec-value text-cyan font-mono">9:16 (Vertical Reel)</span>
+                </div>
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Target Resolution</span>
+                  <span class="meta-spec-value font-mono">1080 × 1920 (FHD)</span>
+                </div>
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Video &amp; Audio Codec</span>
+                  <span class="meta-spec-value font-mono">H.264 / AAC</span>
+                </div>
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Target Frame Rate</span>
+                  <span class="meta-spec-value font-mono" id="val-render-fps">30 FPS</span>
+                </div>
+                <div class="meta-spec-item">
+                  <span class="meta-spec-label">Estimated Duration</span>
+                  <span class="meta-spec-value font-mono text-cyan" id="val-render-duration">--</span>
+                </div>
+              </div>
+
+              <!-- Render Options -->
+              <div class="param-group" style="background: rgba(18, 20, 29, 0.5); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                <div class="param-label-row" style="margin-bottom: 8px;">
+                  <span class="param-label">Render Configuration</span>
+                  <span class="badge badge-cyan" id="val-render-pipeline-badge">Production Safe</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px;">
+                  <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                    <span>Include Synchronized Audio</span>
+                    <input type="checkbox" id="chk-render-audio" checked style="accent-color: var(--accent-cyan);">
+                  </label>
+                  <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                    <span>Include Kinetic Lyrics (Text Behind Character)</span>
+                    <input type="checkbox" id="chk-render-lyrics" checked style="accent-color: var(--accent-cyan);">
+                  </label>
+                  <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                    <span>Force Fresh Re-render</span>
+                    <input type="checkbox" id="chk-render-force" style="accent-color: var(--accent-pink);">
+                  </label>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button type="button" class="btn-primary-cyan" id="btn-trigger-final-render" style="width: 100%; justify-content: center; padding: 12px 16px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px;">
+                  <span>⚡ Render Final Reel (1080×1920 MP4)</span>
+                </button>
+                <button type="button" class="btn-terminal-action" id="btn-cancel-final-render" style="display: none; width: 100%; justify-content: center; color: var(--accent-pink); border-color: rgba(255,46,99,0.4); padding: 8px;">
+                  ✕ Cancel In-Progress Render
+                </button>
+              </div>
+
+              <!-- Real-time Status & Progress Banner -->
+              <div class="comic-status-banner" id="final-render-status-box" style="display: none;">
+                <div class="comic-status-spinner" id="final-render-status-spinner"></div>
+                <div class="comic-status-text-group" style="width: 100%;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="comic-status-title" id="final-render-status-title">Preparing final render...</span>
+                    <span class="font-mono text-cyan" id="final-render-status-percent" style="font-size: 11px; font-weight: 700;">0%</span>
+                  </div>
+                  <span class="comic-status-sub" id="final-render-status-sub">Compositing 3D comic scenes &amp; text behind character</span>
+                  <div class="render-progress-track">
+                    <div class="render-progress-bar" id="final-render-progress-bar"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Final Video In-App Preview Player (9:16) -->
+              <div class="param-group">
+                <div class="param-label-row">
+                  <span class="param-label">Final 9:16 Reel Preview</span>
+                  <span class="badge badge-cyan" id="val-render-status-badge">Standby</span>
+                </div>
+                <div class="reel-player-wrapper" id="reel-player-wrapper" style="margin-top: 8px;">
+                  <video id="final-reel-player" class="reel-player-video" controls playsinline preload="metadata" style="display: none;"></video>
+                  <div class="reel-player-empty" id="reel-player-empty-state">
+                    <div class="reel-player-empty-icon">🎬</div>
+                    <div style="font-weight: 600; color: var(--text-primary);">No Rendered Reel</div>
+                    <div style="line-height: 1.4;">Click <strong>"Render Final Reel"</strong> to composite scenes, layers, kinetic typography, and synchronized audio.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Secure Download Button -->
+              <div id="reel-download-container" style="display: none;">
+                <a id="btn-download-final-reel" class="reel-download-btn" href="#" download target="_blank">
+                  <span>⬇</span>
+                  <span>Download Final 9:16 Reel (MP4)</span>
+                </a>
+              </div>
+
+              <!-- Render Job History Container -->
+              <div class="param-group" style="margin-top: 10px;">
+                <div class="param-label-row">
+                  <span class="param-label">Render History</span>
+                  <span class="badge badge-optional" id="val-render-jobs-count">0 Jobs</span>
+                </div>
+                <div class="comic-frames-scroll-list" id="render-jobs-history-container" style="max-height: 160px;">
+                  <div class="scenes-empty-placeholder">
+                    Render history will appear here once rendering is initiated.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- ===============================================================
+         BOTTOM: PROCESSING PIPELINE & TERMINAL LOG
+         =============================================================== -->
+    <footer class="studio-bottom-dock" aria-label="Pipeline Timeline & Terminal">
+      <!-- Dock Header Bar -->
+      <div class="dock-header-bar">
+        <div class="dock-title-group">
+          <span class="dock-title">
+            <span class="dock-title-glyph">◈</span> Processing Pipeline (11 Stages)
+          </span>
+          <span class="badge badge-optional">STATE: READY</span>
+        </div>
+
+        <div class="dock-actions">
+          <button type="button" class="terminal-toggle-btn" id="btn-toggle-terminal">
+            <span>◈ Telemetry Log</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 11-Stage Processing Timeline Track -->
+      <div class="pipeline-track-container" id="pipeline-track-container">
+        <div class="pipeline-track" id="pipeline-track">
+          <!-- Dynamically populated with 11 stage nodes by PipelineController -->
+        </div>
+      </div>
+
+      <!-- Collapsible Terminal Drawer -->
+      <div class="terminal-drawer" id="terminal-drawer">
+        <div class="terminal-toolbar">
+          <span class="terminal-title">
+            <span>⚡</span> STUDIO TELEMETRY LOG (FASTAPI STREAM STANDBY)
+          </span>
+          <div class="terminal-actions">
+            <button type="button" class="btn-terminal-action" id="btn-copy-terminal">Copy Log</button>
+            <button type="button" class="btn-terminal-action" id="btn-clear-terminal">Clear</button>
+          </div>
+        </div>
+        <div class="terminal-body" id="terminal-body">
+          <!-- Populated by updateStatus() -->
+        </div>
+      </div>
+    </footer>
+
+    <!-- ===============================================================
+         MODALS & OVERLAYS
+         =============================================================== -->
+    
+    <!-- 1. Generation Info Modal (Triggered on 'Generate 3D Reel') -->
+    <div class="studio-modal-backdrop" id="modal-generation-info" role="dialog" aria-modal="true" aria-labelledby="modal-gen-title">
+      <div class="studio-modal-window">
+        <div class="modal-header">
+          <div class="modal-title" id="modal-gen-title">
+            <span class="text-cyan">◈</span> Generation Pipeline Standby
+          </div>
+          <button type="button" class="modal-close-btn" data-close-modal aria-label="Close dialog">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="callout-box">
+            <strong>Phase 1 UI Verification Active:</strong> Source video and parameters are verified and prepared for transformation.
+          </div>
+          <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+            In Phase 1, AI models (Whisper, Comic SDXL LoRA, FFmpeg pipeline) are intentionally disconnected as per the architectural roadmap.
+          </p>
+          <div class="meta-spec-list">
+            <div class="meta-spec-item">
+              <span class="meta-spec-label">Attached Video</span>
+              <span class="meta-spec-value text-cyan" id="modal-video-name">Ready</span>
+            </div>
+            <div class="meta-spec-item">
+              <span class="meta-spec-label">Style Preset</span>
+              <span class="meta-spec-value">3D Comic</span>
+            </div>
+            <div class="meta-spec-item">
+              <span class="meta-spec-label">Kinetic Lyrics</span>
+              <span class="meta-spec-value">Enabled</span>
+            </div>
+            <div class="meta-spec-item">
+              <span class="meta-spec-label">FastAPI Endpoint</span>
+              <span class="meta-spec-value text-muted font-mono">POST /api/v1/generate/start (Phase 2)</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-primary-cyan" data-close-modal>Understood</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Projects Modal -->
+    <div class="studio-modal-backdrop" id="modal-projects" role="dialog" aria-modal="true" aria-labelledby="modal-proj-title">
+      <div class="studio-modal-window">
+        <div class="modal-header">
+          <div class="modal-title" id="modal-proj-title">
+            <span class="text-cyan">📁</span> Studio Projects (SQLite Persistent)
+          </div>
+          <button type="button" class="modal-close-btn" data-close-modal aria-label="Close dialog">✕</button>
+        </div>
+        <div class="modal-body">
+          <!-- Active Project Banner -->
+          <div class="callout-box">
+            <span>Active Session:</span> <strong class="text-cyan font-mono" id="modal-active-project">PROJ-...</strong>
+          </div>
+
+          <!-- Create New Project Section -->
+          <div class="param-group">
+            <span class="param-label" style="font-weight: 600; font-size: 12px; text-transform: uppercase;">Create New Project</span>
+            <div class="new-project-box">
+              <input type="text" class="new-project-input font-mono" id="input-new-project-name" placeholder="Enter project name (e.g. Cyber Hero Reel)..." maxlength="100">
+              <button type="button" class="btn-primary-cyan" id="btn-create-new-project">
+                <span>+ Create</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Persistent Projects List -->
+          <div class="param-group">
+            <div class="param-label-row">
+              <span class="param-label" style="font-weight: 600; font-size: 12px; text-transform: uppercase;">Saved Studio Projects</span>
+              <button type="button" class="btn-terminal-action" id="btn-refresh-projects" title="Refresh projects from SQLite">↻ Refresh</button>
+            </div>
+            <div class="projects-scroll-list" id="projects-list-container">
+              <div style="text-align: center; color: var(--text-muted); padding: 20px; font-size: 12px;">
+                Loading studio projects...
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close-modal>Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Settings Modal -->
+    <div class="studio-modal-backdrop" id="modal-settings" role="dialog" aria-modal="true" aria-labelledby="modal-set-title">
+      <div class="studio-modal-window">
+        <div class="modal-header">
+          <div class="modal-title" id="modal-set-title">
+            <span class="text-cyan">⚙</span> Studio Settings &amp; API Configuration
+          </div>
+          <button type="button" class="modal-close-btn" data-close-modal aria-label="Close dialog">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="param-group">
+            <div class="param-label-row">
+              <span class="param-label">FastAPI Backend URL</span>
+              <span class="param-value-tag">http://127.0.0.1:8000</span>
+            </div>
+            <input type="text" class="studio-input font-mono" value="http://127.0.0.1:8000/api/v1" readonly>
+            <span class="future-badge">Will be activated with FastAPI backend</span>
+          </div>
+
+          <div class="param-group">
+            <div class="param-label-row">
+              <span class="param-label">Theme Mode</span>
+              <span class="param-value-tag text-cyan">Cyber Dark (Fixed)</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" data-close-modal>Done</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Authentication Modal (Phase 16) -->
+    <div class="studio-modal-backdrop" id="modal-auth" role="dialog" aria-modal="true" aria-labelledby="modal-auth-title" style="display: none;">
+      <div class="studio-modal-window auth-modal-window">
+        <div class="modal-header">
+          <div class="modal-title" id="modal-auth-title">
+            <span class="text-cyan">◈</span> <span id="auth-modal-header-text">Welcome Back</span>
+          </div>
+          <button type="button" class="modal-close-btn" id="btn-auth-modal-close" data-close-modal aria-label="Close dialog">✕</button>
+        </div>
+        <div class="modal-body">
+          <!-- Auth Mode Switcher -->
+          <div class="auth-tabs" role="tablist">
+            <button type="button" class="auth-tab active" id="tab-auth-login" role="tab" aria-selected="true">Sign In</button>
+            <button type="button" class="auth-tab" id="tab-auth-register" role="tab" aria-selected="false">Create Account</button>
+          </div>
+
+          <!-- Alert/Error Display Banner -->
+          <div class="auth-alert-banner" id="auth-alert-banner" style="display: none;">
+            <span class="auth-alert-icon">⚠️</span>
+            <span id="auth-alert-text">Invalid credentials</span>
+          </div>
+
+          <!-- Auth Form -->
+          <form id="auth-form" onsubmit="return false;">
+            <div class="param-group">
+              <label class="param-label" for="auth-email-input">Email Address</label>
+              <input type="email" id="auth-email-input" class="studio-input" placeholder="user@example.com" autocomplete="email" required>
+            </div>
+
+            <div class="param-group">
+              <label class="param-label" for="auth-password-input">Password</label>
+              <input type="password" id="auth-password-input" class="studio-input" placeholder="••••••••••••" autocomplete="current-password" required minlength="8">
+              <span class="auth-hint" id="auth-password-hint" style="display: none; font-size: 11px; color: var(--text-muted); margin-top: 4px;">Must be at least 8 characters.</span>
+            </div>
+
+            <button type="submit" class="btn-primary-cyan auth-submit-btn" id="btn-auth-submit">
+              <span id="btn-auth-submit-text">Sign In</span>
+            </button>
+          </form>
+
+          <div class="auth-toggle-prompt">
+            <span id="auth-toggle-prompt-text">Don't have an account?</span>
+            <button type="button" class="auth-toggle-link" id="btn-toggle-auth-mode">Create an Account</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" aria-live="polite"></div>
+
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/state.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/canvas.js"></script>
+  <script src="js/pipeline.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

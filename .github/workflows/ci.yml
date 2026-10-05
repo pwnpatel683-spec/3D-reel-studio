@@ -1,0 +1,180 @@
+name: 3D Reel Studio — CI/CD & Deployment Readiness
+
+on:
+  push:
+    branches: [ main, master, "release/*" ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ===========================================================================
+  # 1. SECURITY & SECRETS AUDIT
+  # ===========================================================================
+  security-audit:
+    name: Security & Secrets Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Verify No Secrets or .env Files Committed
+        run: |
+          echo "Scanning repository for accidentally committed sensitive files..."
+          if find . -name "*.env" -not -name ".env.example" | grep -q .; then
+            echo "ERROR: Found real .env file in git checkout!"
+            exit 1
+          fi
+          if find . -name "*.db" -o -name "*.sqlite" -o -name "*.pem" -o -name "*.key" | grep -q .; then
+            echo "ERROR: Found database or private key file in git checkout!"
+            exit 1
+          fi
+          echo "Security Scan Passed: No credentials or database files detected."
+
+  # ===========================================================================
+  # 2. BACKEND TEST SUITE & REGRESSION
+  # ===========================================================================
+  backend-tests:
+    name: Backend Regression Suite (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    needs: [security-audit]
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install System Dependencies (FFmpeg & OpenCV Libs)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ffmpeg \
+            libgl1 \
+            libglib2.0-0 \
+            curl
+
+      - name: Verify FFmpeg & FFprobe Runtime
+        run: |
+          ffmpeg -version
+          ffprobe -version
+
+      - name: Install Python Package Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run Full Automated Regression Test Suite
+        env:
+          ENVIRONMENT: test
+          APP_ENV: test
+          DEBUG: "false"
+          AUTH_SECRET: "ci-test-secret-key-must-be-at-least-256-bits-long-for-hmac-sha256"
+          DATABASE_URL: "sqlite:///./ci_test.db"
+          MEDIA_STORAGE_ROOT: "storage"
+          TEMP_STORAGE_ROOT: "storage/temp"
+        run: |
+          python -m pytest backend/tests -v
+
+  # ===========================================================================
+  # 3. FRONTEND STATIC ASSETS VALIDATION
+  # ===========================================================================
+  frontend-validation:
+    name: Frontend Asset & API Config Validation
+    runs-on: ubuntu-latest
+    needs: [security-audit]
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Validate Frontend Assets & Dynamic Base URL Resolution
+        run: |
+          echo "Checking frontend file tree integrity..."
+          test -f index.html
+          test -f css/main.css
+          test -f css/studio.css
+          test -f css/canvas.css
+          test -f css/pipeline.css
+          test -f css/components.css
+          test -f js/app.js
+          test -f js/api.js
+          test -f js/auth.js
+          test -f js/canvas.js
+          test -f js/pipeline.js
+          echo "Checking js/api.js dynamic API resolution logic..."
+          grep -q "API_BASE_URL" js/api.js
+          echo "Frontend static asset integrity verified."
+
+  # ===========================================================================
+  # 4. DOCKER BUILD & CONTAINER SMOKE CHECK
+  # ===========================================================================
+  docker-build:
+    name: Docker Image Build & Container Probes
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-validation]
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: actions/setup-buildx-action@v3
+
+      - name: Build Production Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: 3d-reel-studio:latest
+          load: true
+
+      - name: Verify Non-Root Execution in Container
+        run: |
+          USER_NAME=$(docker run --rm 3d-reel-studio:latest whoami)
+          echo "Container runtime user: $USER_NAME"
+          if [ "$USER_NAME" != "appuser" ]; then
+            echo "ERROR: Container is not running as non-root appuser!"
+            exit 1
+          fi
+
+      - name: Verify FFmpeg Inside Container
+        run: |
+          docker run --rm 3d-reel-studio:latest ffmpeg -version
+          docker run --rm 3d-reel-studio:latest ffprobe -version
+
+      - name: Run Container & Test Health Endpoints
+        run: |
+          docker run -d \
+            --name reel-studio-test-container \
+            -p 8000:8000 \
+            -e ENVIRONMENT=production \
+            -e APP_ENV=production \
+            -e DEBUG=false \
+            -e AUTH_SECRET="ci-docker-test-secret-key-256-bit-length-token" \
+            3d-reel-studio:latest
+
+          echo "Waiting for container to start up..."
+          sleep 5
+
+          echo "Probing GET /api/v1/health/live..."
+          curl --fail --retry 5 --retry-delay 2 http://localhost:8000/api/v1/health/live
+
+          echo "Probing GET /api/v1/health/ready..."
+          curl --fail --retry 5 --retry-delay 2 http://localhost:8000/api/v1/health/ready
+
+          echo "Stopping test container..."
+          docker stop reel-studio-test-container
+          docker rm reel-studio-test-container
+          echo "Docker container build & probe validation passed successfully!"

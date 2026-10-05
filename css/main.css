@@ -1,0 +1,215 @@
+/* ===================================================================
+   3D REEL STUDIO — Main Design System & Base Variables
+   Phase 1 Frontend Foundation
+   =================================================================== */
+
+:root {
+  /* Core Color Palette */
+  --bg-darkest: #07080b;
+  --bg-primary: #0b0c10;
+  --bg-secondary: #12141d;
+  --bg-tertiary: #181b26;
+  --bg-surface: #1e2230;
+  --bg-surface-hover: #262c3e;
+  
+  /* Glassmorphism & Translucency */
+  --glass-bg: rgba(18, 20, 29, 0.82);
+  --glass-bg-hover: rgba(26, 30, 44, 0.92);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-focus: rgba(0, 255, 245, 0.4);
+  
+  /* Brand Accents */
+  --neon-red: #ff2e63;
+  --neon-red-glow: rgba(255, 46, 99, 0.3);
+  --neon-red-dark: #b81541;
+  --cyber-cyan: #00fff5;
+  --cyber-cyan-glow: rgba(0, 255, 245, 0.3);
+  --cyber-cyan-dark: #009993;
+  --cyber-blue: #00a8ff;
+  --cyber-purple: #9d4edd;
+  
+  /* Status Colors */
+  --status-ready: #00fff5;
+  --status-pending: #5a627d;
+  --status-processing: #ffb703;
+  --status-completed: #06d6a0;
+  --status-failed: #ff2e63;
+  
+  /* Typography */
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, Menlo, monospace;
+  --font-display: 'Outfit', sans-serif;
+  
+  /* Text Colors */
+  --text-primary: #f0f3f8;
+  --text-secondary: #9aa0b8;
+  --text-muted: #5e6682;
+  --text-disabled: #3d4358;
+  --text-bright: #ffffff;
+  
+  /* Borders & Dividers */
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-light: rgba(255, 255, 255, 0.12);
+  --border-neon-red: rgba(255, 46, 99, 0.5);
+  --border-cyber-cyan: rgba(0, 255, 245, 0.5);
+  
+  /* Shadows & Elevations */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.65);
+  --shadow-glow-red: 0 0 24px rgba(255, 46, 99, 0.25);
+  --shadow-glow-cyan: 0 0 24px rgba(0, 255, 245, 0.25);
+  
+  /* Transitions */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* Layout Sizing */
+  --header-height: 64px;
+  --pipeline-height: 110px;
+  --left-panel-width: 360px;
+  --right-panel-width: 340px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+}
+
+/* Base Reset & Box Sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* Background Cyber Atmosphere */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 15% 15%, rgba(255, 46, 99, 0.04) 0%, transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(0, 255, 245, 0.04) 0%, transparent 45%),
+    radial-gradient(circle at 50% 85%, rgba(0, 168, 255, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Grid Pattern Overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Root App Shell */
+#app-root {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Accessible Focus Rings */
+:focus-visible {
+  outline: 2px solid var(--cyber-cyan);
+  outline-offset: 2px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-darkest);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-surface);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-active);
+}
+
+/* Typography Utilities */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-bright);
+  letter-spacing: -0.01em;
+}
+
+.text-cyan { color: var(--cyber-cyan); }
+.text-red { color: var(--neon-red); }
+.text-muted { color: var(--text-muted); }
+.font-mono { font-family: var(--font-mono); }
+
+/* Common Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-optional {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.badge-cyan {
+  background: rgba(0, 255, 245, 0.12);
+  color: var(--cyber-cyan);
+  border: 1px solid rgba(0, 255, 245, 0.3);
+}
+
+.badge-red {
+  background: rgba(255, 46, 99, 0.12);
+  color: var(--neon-red);
+  border: 1px solid rgba(255, 46, 99, 0.3);
+}
+
+.badge-future {
+  background: rgba(157, 78, 221, 0.12);
+  color: #c77dff;
+  border: 1px solid rgba(157, 78, 221, 0.3);
+}

@@ -1,0 +1,368 @@
+/* ===================================================================
+   3D REEL STUDIO — Center Live Studio & 9:16 Canvas Overlay
+   Phase 1 Live Studio Styles
+   =================================================================== */
+
+.center-studio {
+  background: var(--bg-darkest);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Studio Stage Header Bar */
+.studio-stage-header {
+  height: 48px;
+  padding: 0 20px;
+  background: rgba(18, 20, 29, 0.4);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.stage-title-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stage-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stage-specs {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.stage-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tool-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+
+.tool-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.tool-btn.active {
+  background: rgba(0, 255, 245, 0.15);
+  border-color: rgba(0, 255, 245, 0.4);
+  color: var(--cyber-cyan);
+}
+
+/* -------------------------------------------------------------------
+   9:16 VERTICAL REEL WORKSPACE CONTAINER
+   ------------------------------------------------------------------- */
+.studio-viewport-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  background: 
+    radial-gradient(circle at center, rgba(18, 20, 29, 0.6) 0%, rgba(7, 8, 11, 0.95) 100%);
+}
+
+/* 9:16 Phone Frame Mock */
+.reel-frame {
+  height: 100%;
+  max-height: 560px;
+  aspect-ratio: 9 / 16;
+  background: #000000;
+  border-radius: 24px;
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 12px 48px rgba(0, 0, 0, 0.8),
+    0 0 40px rgba(0, 255, 245, 0.06);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow var(--transition-normal);
+}
+
+.reel-frame.has-video {
+  box-shadow: 
+    0 0 0 1px rgba(0, 255, 245, 0.3),
+    0 16px 56px rgba(0, 0, 0, 0.9),
+    0 0 50px rgba(0, 255, 245, 0.12);
+}
+
+/* Media Stack Container (Video + Canvas) */
+.media-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#video-player {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+#video-player.active {
+  display: block;
+}
+
+/* Transparent Canvas Overlay positioned exactly over the video */
+#canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Safe Zone Guides Overlay (Simulates TikTok/Reels UI) */
+.safe-zone-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 15;
+  display: none;
+  border: 1px dashed rgba(255, 46, 99, 0.4);
+}
+
+.safe-zone-overlay.visible {
+  display: block;
+}
+
+.safe-zone-top {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  height: 40px;
+  border-bottom: 1px dashed rgba(0, 255, 245, 0.3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(0, 255, 245, 0.6);
+  padding: 2px 4px;
+}
+
+.safe-zone-bottom {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 64px;
+  height: 70px;
+  border-top: 1px dashed rgba(0, 255, 245, 0.3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(0, 255, 245, 0.6);
+  padding: 2px 4px;
+}
+
+.safe-zone-right {
+  position: absolute;
+  bottom: 80px;
+  right: 8px;
+  width: 48px;
+  height: 160px;
+  border-left: 1px dashed rgba(0, 255, 245, 0.3);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(0, 255, 245, 0.6);
+  padding: 2px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+/* Empty Studio State */
+.empty-preview-state {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  text-align: center;
+  gap: 16px;
+  z-index: 5;
+  background: 
+    radial-gradient(circle at center, rgba(26, 30, 44, 0.6) 0%, rgba(11, 12, 16, 0.9) 100%);
+}
+
+.empty-preview-state.hidden {
+  display: none;
+}
+
+.empty-icon-shield {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(0, 255, 245, 0.06);
+  border: 1px solid rgba(0, 255, 245, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cyber-cyan);
+  box-shadow: 0 0 30px rgba(0, 255, 245, 0.1);
+  animation: pulseEmpty 3s infinite ease-in-out;
+}
+
+@keyframes pulseEmpty {
+  0%, 100% { transform: scale(1); border-color: rgba(0, 255, 245, 0.2); }
+  50% { transform: scale(1.05); border-color: rgba(0, 255, 245, 0.5); }
+}
+
+.empty-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  max-width: 220px;
+  line-height: 1.4;
+}
+
+.empty-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  max-width: 200px;
+}
+
+.empty-specs-badge {
+  display: flex;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--cyber-cyan);
+  background: rgba(0, 255, 245, 0.08);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(0, 255, 245, 0.2);
+}
+
+/* -------------------------------------------------------------------
+   STUDIO PLAYER CONTROLS BAR
+   ------------------------------------------------------------------- */
+.studio-player-bar {
+  padding: 10px 18px;
+  background: rgba(18, 20, 29, 0.9);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.scrubber-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.time-display {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  min-width: 76px;
+}
+
+.video-scrubber {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  outline: none;
+}
+
+.video-scrubber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--cyber-cyan);
+  box-shadow: 0 0 6px var(--cyber-cyan-glow);
+}
+
+.player-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.controls-left, .controls-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ctrl-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-primary);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-subtle);
+}
+
+.ctrl-btn.play-btn {
+  background: rgba(0, 255, 245, 0.12);
+  color: var(--cyber-cyan);
+  border: 1px solid rgba(0, 255, 245, 0.3);
+}
+
+.ctrl-btn.play-btn:hover {
+  background: var(--cyber-cyan);
+  color: #0b0c10;
+}
