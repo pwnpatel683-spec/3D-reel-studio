@@ -108,11 +108,12 @@ jobs:
           test -f css/canvas.css
           test -f css/pipeline.css
           test -f css/components.css
-          test -f js/app.js
+          test -f js/state.js
           test -f js/api.js
-          test -f js/auth.js
           test -f js/canvas.js
           test -f js/pipeline.js
+          test -f js/ui.js
+          test -f js/app.js
           echo "Checking js/api.js dynamic API resolution logic..."
           grep -q "API_BASE_URL" js/api.js
           echo "Frontend static asset integrity verified."
