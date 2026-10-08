@@ -166,14 +166,25 @@ jobs:
             -e AUTH_SECRET="ci-docker-test-secret-key-256-bit-length-token" \
             3d-reel-studio:latest
 
-          echo "Waiting for container to start up..."
-          sleep 5
-
           echo "Probing GET /api/v1/health/live..."
-          curl --fail --retry 5 --retry-delay 2 http://localhost:8000/api/v1/health/live
+          if ! curl --fail --retry 10 --retry-delay 2 --retry-connrefused --retry-max-time 30 \
+            http://localhost:8000/api/v1/health/live; then
+            echo "ERROR: /api/v1/health/live probe failed. Printing container logs:"
+            docker logs reel-studio-test-container
+            docker stop reel-studio-test-container || true
+            docker rm reel-studio-test-container || true
+            exit 1
+          fi
 
           echo "Probing GET /api/v1/health/ready..."
-          curl --fail --retry 5 --retry-delay 2 http://localhost:8000/api/v1/health/ready
+          if ! curl --fail --retry 10 --retry-delay 2 --retry-connrefused --retry-max-time 30 \
+            http://localhost:8000/api/v1/health/ready; then
+            echo "ERROR: /api/v1/health/ready probe failed. Printing container logs:"
+            docker logs reel-studio-test-container
+            docker stop reel-studio-test-container || true
+            docker rm reel-studio-test-container || true
+            exit 1
+          fi
 
           echo "Stopping test container..."
           docker stop reel-studio-test-container
